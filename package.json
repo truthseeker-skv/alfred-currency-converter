@@ -13,8 +13,8 @@
     "clean": "rimraf ./lib"
   },
   "dependencies": {
-    "@truthseeker-skv/alfred-workflow": "0.0.23",
-    "axios": "0.21.1",
+    "@truthseeker-skv/alfred-workflow": "0.0.26",
+    "axios": "0.19.2",
     "happy-dom": "2.13.0",
     "lodash": "4.17.20",
     "tslib": "2.1.0"

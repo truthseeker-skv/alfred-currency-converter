@@ -1,14 +1,14 @@
-import { ICurrency, ICurrencyPair } from './types';
+import { ICurrencyPair } from './types';
 import workflow from './workflow';
 
 export interface IConfig {
-  isRatesLoading: boolean;
   currencies: Array<string>;
   pinnedPair: ICurrencyPair | null;
 }
 
 export interface ICache {
-  currencyRates: Record<ICurrency['code'], ICurrency>;
+  isRatesLoading: boolean;
+  currencyRates: Record<string, number>;
 }
 
 export const config = workflow.config;

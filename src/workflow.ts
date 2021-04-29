@@ -1,7 +1,7 @@
 import { getWorkflow } from '@truthseeker-skv/alfred-workflow/lib/workflow';
 
 import { IConfig, ICache } from './config';
-import { ICurrency, ICurrencyPair } from './types';
+import { ICurrencyPair } from './types';
 
 const DEFAULT_CURRENCIES = ['BYN', 'RUB', 'USD', 'EUR', 'KZT', 'UAH', 'CAD', 'PLN' ,'GBP'];
 
@@ -18,12 +18,12 @@ export default {
   ...workflow,
 
   currencies: () => workflow.config.get('currencies'),
-  isRatesLoading: () => workflow.config.get('isRatesLoading', false),
+  isRatesLoading: () => workflow.cache.get('isRatesLoading'),
   currencyRates: () => workflow.cache.get('currencyRates'),
   pinnedPair: () => workflow.config.get('pinnedPair', null),
 
-  setIsRatesLoading: (isLoading: boolean) => workflow.config.set('isRatesLoading', isLoading),
-  setCurrencyRates: (rates: Record<string, ICurrency>) => (
+  setIsRatesLoading: (isLoading: boolean) => workflow.cache.set('isRatesLoading', isLoading, { maxAge: 5000 }),
+  setCurrencyRates: (rates: Record<string, number>) => (
     workflow.cache.set('currencyRates', rates, { maxAge: 60 * 60 * 1000 })
   ),
   setPinnedPair: (pair: ICurrencyPair) => workflow.config.set('pinnedPair', pair),

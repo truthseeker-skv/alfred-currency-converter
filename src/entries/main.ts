@@ -4,7 +4,7 @@ import isNumber from 'lodash/isNumber';
 import { run, createItem, createInfoItem } from '@truthseeker-skv/alfred-workflow';
 
 import { pinPairAction, Action } from '../actions';
-import { ICurrency, ICurrencyPair } from '../types';
+import { ICurrencyPair } from '../types';
 import workflow from '../workflow';
 
 async function main() {
@@ -75,7 +75,7 @@ interface IConvertPriceParams {
   price: number | null;
   from: string;
   to: string;
-  rates: Record<string, ICurrency> | null;
+  rates: Record<string, number> | null;
 }
 
 function convertPrice(params: IConvertPriceParams) {
@@ -86,16 +86,16 @@ function convertPrice(params: IConvertPriceParams) {
     return null;
   }
 
-  const fromRate = rates[params.from].rate;
-  const toRate = rates[params.to].rate;
+  const fromRate = rates[params.from];
+  const toRate = rates[params.to];
 
   // TODO: needs to resolve locale with config + add possibility to change it dynamically
   return new Intl.NumberFormat('ru-Ru', { style: 'currency', currency: params.to })
-    .format(round(price * fromRate / toRate, 2));
+    .format(round(price * toRate / fromRate, 2));
 }
 
-function retrieveCurrenciesRates(): Record<string, ICurrency> | null {
-  const rates = workflow.currencyRates();
+function retrieveCurrenciesRates(): Record<string, number> | null {
+  const rates = workflow.currencyRates() as Record<string, number>;
 
   if (!workflow.isRatesLoading() && !rates) {
     runUpdateCurrenciesRatesScript();

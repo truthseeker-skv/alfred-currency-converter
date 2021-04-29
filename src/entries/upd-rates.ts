@@ -1,9 +1,14 @@
-import { ICurrency } from '../types';
-import { loadPageDom } from '../utils';
+import axios from 'axios';
+
+import { logger } from '@truthseeker-skv/alfred-workflow';
+
 import workflow from '../workflow';
 
 (async () => {
   workflow.setIsRatesLoading(true);
+
+  logger.log('response#start');
+
   await loadCurrencies()
     .then((rates) => {
       workflow.setIsRatesLoading(false);
@@ -11,27 +16,13 @@ import workflow from '../workflow';
     });
 })();
 
-export async function loadCurrencies(): Promise<Record<string, ICurrency>> {
+export async function loadCurrencies(): Promise<Record<string, number>> {
   try {
-    const dom = await loadPageDom('https://www.cbr.ru/currency_base/daily/');
+    const response = await axios.get('https://www.cbr-xml-daily.ru/latest.js');
 
-    const result = Array.from(dom.querySelectorAll('table.data tr'))
-      .slice(1)
-      .reduce((acc: Record<string, ICurrency>, row) => {
-        const [_, code, num, name, rate] = Array.from(row.querySelectorAll('td')).map(it => it.textContent.trim());
+    logger.log('response: ', response.data);
 
-        acc[code] = {
-          code,
-          name,
-          rate: parseFloat(rate.replace(',', '.')) / parseInt(num, 10),
-        };
-
-        return acc;
-      }, {});
-
-    return result
-      ? { RUB: { code: 'RUB', name: 'Российский рубль', rate: 1 }, ...result }
-      : {};
+    return { RUB: 1, ...response.data.rates };
   } catch (err) {
     throw new Error(`Failed to load currencies rates.\r\n${err.message}`);
   }
